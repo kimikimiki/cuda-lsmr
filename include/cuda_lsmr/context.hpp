@@ -22,8 +22,8 @@ class Context {
 
   Context(const Context&) = delete;
   Context& operator=(const Context&) = delete;
-  Context(Context&&) noexcept;
-  Context& operator=(Context&&) noexcept;
+  Context(Context&&) = delete;
+  Context& operator=(Context&&) = delete;
 
   /// Returns the stream used by every operation in this context.
   [[nodiscard]] cudaStream_t stream() const noexcept;

@@ -1,0 +1,3 @@
+add_executable(cuda_lsmr_sparse_example sparse_example.cu)
+target_link_libraries(cuda_lsmr_sparse_example PRIVATE cuda_lsmr::cuda_lsmr)
+

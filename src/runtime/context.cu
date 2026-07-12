@@ -56,9 +56,6 @@ Context::Context(cudaStream_t stream) {
 
 Context::~Context() = default;
 
-Context::Context(Context&&) noexcept = default;
-Context& Context::operator=(Context&&) noexcept = default;
-
 cudaStream_t Context::stream() const noexcept {
   return impl_ ? impl_->stream : nullptr;
 }
