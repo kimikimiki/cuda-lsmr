@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 600" role="img" aria-labelledby="title desc">
+  <title id="title">Stream ordered memory pool timeline</title>
+  <desc id="desc">The first solve grows reusable buffers from a private pool while later solves reuse capacity without allocations in the iteration loop.</desc>
+  <defs>
+    <style>
+      .bg { fill: #f7f3e8; }
+      .lane { stroke: #263238; stroke-width: 4; }
+      .alloc { fill: #e9b44c; stroke: #263238; stroke-width: 2; rx: 12; }
+      .work { fill: #83b8d4; stroke: #263238; stroke-width: 2; rx: 12; }
+      .reuse { fill: #a9cf91; stroke: #263238; stroke-width: 2; rx: 12; }
+      .free { fill: #efb5a3; stroke: #263238; stroke-width: 2; rx: 12; }
+      .title { font: 700 28px 'DejaVu Sans', sans-serif; fill: #172026; }
+      .label { font: 500 20px 'DejaVu Sans', sans-serif; fill: #263238; }
+      .small { font: 500 17px 'DejaVu Sans', sans-serif; fill: #263238; }
+      .arrow { stroke: #263238; stroke-width: 3; fill: none; marker-end: url(#head); }
+    </style>
+    <marker id="head" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto"><path d="M0 0 L12 6 L0 12 Z" fill="#263238"/></marker>
+  </defs>
+  <rect class="bg" width="1200" height="600"/>
+  <text class="title" x="600" y="45" text-anchor="middle">Private cudaMemPool_t: capacity grows, iterations reuse</text>
+  <text class="label" x="55" y="122">Host</text><line class="lane" x1="150" y1="115" x2="1140" y2="115"/>
+  <text class="label" x="45" y="282">Stream</text><line class="lane" x1="150" y1="275" x2="1140" y2="275"/>
+  <text class="label" x="53" y="442">Pool</text><line class="lane" x1="150" y1="435" x2="1140" y2="435"/>
+  <rect class="alloc" x="190" y="75" width="190" height="70"/>
+  <text class="label" x="285" y="105" text-anchor="middle">Reserve(m,n)</text>
+  <text class="small" x="285" y="130" text-anchor="middle">first shape</text>
+  <path class="arrow" d="M285 145 V235"/>
+  <rect class="alloc" x="190" y="235" width="190" height="80"/>
+  <text class="small" x="285" y="267" text-anchor="middle">MallocFromPoolAsync</text>
+  <text class="small" x="285" y="293" text-anchor="middle">u,v,h,hbar,workspace</text>
+  <path class="arrow" d="M285 315 V395"/>
+  <rect class="alloc" x="190" y="395" width="190" height="80"/>
+  <text class="label" x="285" y="428" text-anchor="middle">Physical pages</text>
+  <text class="small" x="285" y="454" text-anchor="middle">capacity retained</text>
+  <rect class="work" x="425" y="235" width="245" height="80"/>
+  <text class="label" x="548" y="267" text-anchor="middle">Solve 1 iterations</text>
+  <text class="small" x="548" y="293" text-anchor="middle">no allocation</text>
+  <rect class="reuse" x="715" y="75" width="190" height="70"/>
+  <text class="label" x="810" y="105" text-anchor="middle">Reserve(m,n)</text>
+  <text class="small" x="810" y="130" text-anchor="middle">same capacity</text>
+  <path class="arrow" d="M810 145 V235"/>
+  <rect class="reuse" x="715" y="235" width="245" height="80"/>
+  <text class="label" x="838" y="267" text-anchor="middle">Solve 2 iterations</text>
+  <text class="small" x="838" y="293" text-anchor="middle">reuse existing pointers</text>
+  <rect class="free" x="1000" y="235" width="150" height="80"/>
+  <text class="label" x="1075" y="267" text-anchor="middle">Destroy</text>
+  <text class="small" x="1075" y="293" text-anchor="middle">FreeAsync</text>
+  <path class="arrow" d="M1075 315 V395"/>
+  <rect class="free" x="990" y="395" width="170" height="80"/>
+  <text class="label" x="1075" y="428" text-anchor="middle">Pool destroy</text>
+  <text class="small" x="1075" y="454" text-anchor="middle">after stream sync</text>
+  <text class="small" x="600" y="545" text-anchor="middle">Allocation and free obey the same stream order as cuSPARSE and fused kernels.</text>
+</svg>

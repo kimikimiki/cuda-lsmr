@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 620" role="img" aria-labelledby="title desc">
+  <title id="title">One LSMR Golub-Kahan iteration</title>
+  <desc id="desc">A forward sparse matrix-vector product updates u, a transpose sparse matrix-vector product updates v, and scalar rotations update hbar and x.</desc>
+  <defs>
+    <style>
+      .bg { fill: #f7f3e8; }
+      .node { fill: #fffdf6; stroke: #263238; stroke-width: 3; rx: 18; }
+      .spmv { fill: #acd7ec; }
+      .norm { fill: #f2cc8f; }
+      .rot { fill: #c9dfb8; }
+      .update { fill: #efb5a3; }
+      .title { font: 700 27px 'DejaVu Sans', sans-serif; fill: #172026; }
+      .label { font: 500 20px 'DejaVu Sans', sans-serif; fill: #263238; }
+      .arrow { stroke: #263238; stroke-width: 4; fill: none; marker-end: url(#head); }
+      .state { stroke: #a33b20; stroke-width: 3; fill: none; marker-end: url(#redhead); }
+    </style>
+    <marker id="head" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto"><path d="M0 0 L12 6 L0 12 Z" fill="#263238"/></marker>
+    <marker id="redhead" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto"><path d="M0 0 L12 6 L0 12 Z" fill="#a33b20"/></marker>
+  </defs>
+  <rect class="bg" width="1200" height="620"/>
+  <text class="title" x="600" y="42" text-anchor="middle">Iteration k: two bandwidth-bound operators, then scalar rotations</text>
+  <rect class="node" x="40" y="110" width="150" height="85"/><text class="title" x="115" y="162" text-anchor="middle">v_k</text>
+  <path class="arrow" d="M190 152 H245"/>
+  <rect class="node spmv" x="245" y="95" width="245" height="115"/>
+  <text class="title" x="368" y="140" text-anchor="middle">Forward SpMV</text>
+  <text class="label" x="368" y="177" text-anchor="middle">A v_k - alpha_k u_k</text>
+  <path class="arrow" d="M490 152 H535"/>
+  <rect class="node norm" x="535" y="95" width="205" height="115"/>
+  <text class="title" x="638" y="140" text-anchor="middle">Normalize</text>
+  <text class="label" x="638" y="177" text-anchor="middle">beta, u_(k+1)</text>
+  <path class="arrow" d="M740 152 H785"/>
+  <rect class="node spmv" x="785" y="95" width="365" height="115"/>
+  <text class="title" x="968" y="140" text-anchor="middle">Transpose SpMV</text>
+  <text class="label" x="968" y="177" text-anchor="middle">A^T u_(k+1) - beta v_k</text>
+  <path class="arrow" d="M968 210 V260"/>
+  <rect class="node norm" x="815" y="260" width="305" height="100"/>
+  <text class="title" x="968" y="302" text-anchor="middle">Normalize</text>
+  <text class="label" x="968" y="335" text-anchor="middle">alpha_(k+1), v_(k+1)</text>
+  <path class="arrow" d="M815 310 H700"/>
+  <rect class="node rot" x="390" y="255" width="310" height="110"/>
+  <text class="title" x="545" y="299" text-anchor="middle">Host rotations</text>
+  <text class="label" x="545" y="334" text-anchor="middle">rho, rhobar, zeta</text>
+  <path class="arrow" d="M545 365 V420"/>
+  <rect class="node update" x="300" y="420" width="490" height="115"/>
+  <text class="title" x="545" y="466" text-anchor="middle">Fused vector recurrence</text>
+  <text class="label" x="545" y="502" text-anchor="middle">hbar_k, x_k, h_k</text>
+  <path class="state" d="M300 478 H145 V195"/>
+  <text class="label" x="98" y="340" transform="rotate(-90 98 340)" text-anchor="middle">next state</text>
+  <path class="state" d="M815 310 H765 V545 H790"/>
+</svg>

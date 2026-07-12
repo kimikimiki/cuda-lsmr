@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 700" role="img" aria-labelledby="title desc">
+  <title id="title">FP32 LSMR benchmark comparison</title>
+  <desc id="desc">Median solve times for cuda-lsmr and CuPy on the Dataset A and Dataset B frame zero datasets.</desc>
+  <defs>
+    <style>
+      .bg { fill: #f7f3e8; }
+      .grid { stroke: #b8b2a6; stroke-width: 2; }
+      .axis { stroke: #263238; stroke-width: 4; }
+      .custom { fill: #2f7f8f; }
+      .cupy { fill: #d36b42; }
+      .title { font: 700 30px 'DejaVu Sans', sans-serif; fill: #172026; }
+      .label { font: 500 20px 'DejaVu Sans', sans-serif; fill: #263238; }
+      .value { font: 700 20px 'DejaVu Sans', sans-serif; fill: #172026; }
+      .note { font: 500 17px 'DejaVu Sans', sans-serif; fill: #263238; }
+    </style>
+  </defs>
+  <rect class="bg" width="1200" height="700"/>
+  <text class="title" x="600" y="45" text-anchor="middle">FP32 LSMR solve time, 7-run median (lower is better)</text>
+  <line class="grid" x1="170" y1="555" x2="1120" y2="555"/>
+  <line class="grid" x1="170" y1="455" x2="1120" y2="455"/>
+  <line class="grid" x1="170" y1="355" x2="1120" y2="355"/>
+  <line class="grid" x1="170" y1="255" x2="1120" y2="255"/>
+  <line class="grid" x1="170" y1="155" x2="1120" y2="155"/>
+  <line class="axis" x1="170" y1="95" x2="170" y2="555"/>
+  <line class="axis" x1="170" y1="555" x2="1120" y2="555"/>
+  <text class="label" x="145" y="562" text-anchor="end">0</text>
+  <text class="label" x="145" y="462" text-anchor="end">50</text>
+  <text class="label" x="145" y="362" text-anchor="end">100</text>
+  <text class="label" x="145" y="262" text-anchor="end">150</text>
+  <text class="label" x="145" y="162" text-anchor="end">200</text>
+  <text class="label" x="145" y="102" text-anchor="end">230 ms</text>
+  <rect class="custom" x="300" y="434.5" width="130" height="120.5" rx="8"/>
+  <rect class="cupy" x="450" y="300.4" width="130" height="254.6" rx="8"/>
+  <text class="value" x="365" y="420" text-anchor="middle">60.24</text>
+  <text class="value" x="515" y="286" text-anchor="middle">127.28</text>
+  <text class="label" x="440" y="595" text-anchor="middle">Dataset A</text>
+  <rect class="custom" x="700" y="220.8" width="130" height="334.2" rx="8"/>
+  <rect class="cupy" x="850" y="95.9" width="130" height="459.1" rx="8"/>
+  <text class="value" x="765" y="207" text-anchor="middle">167.11</text>
+  <text class="value" x="915" y="82" text-anchor="middle">229.57</text>
+  <text class="label" x="840" y="595" text-anchor="middle">Dataset B</text>
+  <rect class="custom" x="310" y="630" width="28" height="20" rx="3"/>
+  <text class="label" x="350" y="647">cuda-lsmr</text>
+  <rect class="cupy" x="520" y="630" width="28" height="20" rx="3"/>
+  <text class="label" x="560" y="647">CuPy 14.0.1</text>
+  <text class="note" x="1180" y="682" text-anchor="end">RTX 3060 Laptop, CUDA 12.9.86, frame 0</text>
+</svg>

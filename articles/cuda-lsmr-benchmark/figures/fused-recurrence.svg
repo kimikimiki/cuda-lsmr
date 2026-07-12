@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 700" role="img" aria-labelledby="title desc">
+  <title id="title">Fused hbar and x recurrence</title>
+  <desc id="desc">Separate kernels write and reread hbar through global memory, while the fused kernel forwards the new hbar value in a register before updating x.</desc>
+  <defs>
+    <style>
+      .bg { fill: #f7f3e8; }
+      .box { fill: #fffdf6; stroke: #263238; stroke-width: 3; rx: 16; }
+      .kernel { fill: #b8d8e8; }
+      .memory { fill: #efb5a3; }
+      .register { fill: #c9dfb8; }
+      .title { font: 700 28px 'DejaVu Sans', sans-serif; fill: #172026; }
+      .label { font: 500 20px 'DejaVu Sans', sans-serif; fill: #263238; }
+      .small { font: 500 17px 'DejaVu Sans', sans-serif; fill: #263238; }
+      .arrow { stroke: #263238; stroke-width: 4; fill: none; marker-end: url(#head); }
+      .waste { stroke: #b22e1f; stroke-width: 5; stroke-dasharray: 10 8; fill: none; marker-end: url(#redhead); }
+    </style>
+    <marker id="head" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto"><path d="M0 0 L12 6 L0 12 Z" fill="#263238"/></marker>
+    <marker id="redhead" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto"><path d="M0 0 L12 6 L0 12 Z" fill="#b22e1f"/></marker>
+  </defs>
+  <rect class="bg" width="1200" height="700"/>
+  <text class="title" x="300" y="45" text-anchor="middle">Separate kernels: 6N float accesses</text>
+  <text class="title" x="900" y="45" text-anchor="middle">Fused kernel: 5N float accesses</text>
+  <rect class="box memory" x="70" y="90" width="460" height="75"/>
+  <text class="label" x="300" y="136" text-anchor="middle">Global: h, old hbar</text>
+  <path class="arrow" d="M300 165 V205"/>
+  <rect class="box kernel" x="115" y="205" width="370" height="90"/>
+  <text class="title" x="300" y="244" text-anchor="middle">Kernel 1</text>
+  <text class="small" x="300" y="273" text-anchor="middle">hbar = h - c_h * hbar</text>
+  <path class="waste" d="M300 295 V350"/>
+  <rect class="box memory" x="70" y="350" width="460" height="75"/>
+  <text class="label" x="300" y="397" text-anchor="middle">Global: write then reread hbar</text>
+  <path class="waste" d="M300 425 V480"/>
+  <rect class="box kernel" x="115" y="480" width="370" height="90"/>
+  <text class="title" x="300" y="519" text-anchor="middle">Kernel 2</text>
+  <text class="small" x="300" y="548" text-anchor="middle">x = x + c_x * hbar</text>
+  <rect class="box memory" x="670" y="90" width="460" height="75"/>
+  <text class="label" x="900" y="136" text-anchor="middle">Global: h, old hbar, x</text>
+  <path class="arrow" d="M900 165 V225"/>
+  <rect class="box kernel" x="650" y="225" width="500" height="230"/>
+  <text class="title" x="900" y="270" text-anchor="middle">UpdateHbarAndXKernel</text>
+  <rect class="box register" x="715" y="305" width="370" height="70"/>
+  <text class="small" x="900" y="335" text-anchor="middle">register next_hbar</text>
+  <text class="small" x="900" y="359" text-anchor="middle">= h - c_h * old_hbar</text>
+  <path class="arrow" d="M900 375 V410"/>
+  <text class="small" x="900" y="438" text-anchor="middle">store hbar; FMA into x</text>
+  <path class="arrow" d="M900 455 V515"/>
+  <rect class="box memory" x="670" y="515" width="460" height="75"/>
+  <text class="label" x="900" y="562" text-anchor="middle">Global: new hbar, new x</text>
+  <text class="label" x="600" y="655" text-anchor="middle">One producer-consumer value stays in a thread register.</text>
+</svg>
+

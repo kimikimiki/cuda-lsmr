@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 680" role="img" aria-labelledby="title desc">
+  <title id="title">Dual CSR and CSC sparse paths</title>
+  <desc id="desc">CSR of A serves forward SpMV while CSC of A is interpreted as CSR of A transpose for transpose SpMV.</desc>
+  <defs>
+    <style>
+      .bg { fill: #f7f3e8; }
+      .box { fill: #fffdf6; stroke: #263238; stroke-width: 3; rx: 18; }
+      .input { fill: #f2cc8f; }
+      .csr { fill: #b8d8e8; }
+      .csc { fill: #c9dfb8; }
+      .op { fill: #efb5a3; }
+      .title { font: 700 29px 'DejaVu Sans', sans-serif; fill: #172026; }
+      .label { font: 500 21px 'DejaVu Sans', sans-serif; fill: #263238; }
+      .small { font: 500 18px 'DejaVu Sans', sans-serif; fill: #263238; }
+      .arrow { stroke: #263238; stroke-width: 4; fill: none; marker-end: url(#head); }
+      .convert { stroke: #a33b20; stroke-width: 4; stroke-dasharray: 10 8; fill: none; marker-end: url(#redhead); }
+    </style>
+    <marker id="head" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto"><path d="M0 0 L12 6 L0 12 Z" fill="#263238"/></marker>
+    <marker id="redhead" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto"><path d="M0 0 L12 6 L0 12 Z" fill="#a33b20"/></marker>
+  </defs>
+  <rect class="bg" width="1200" height="680"/>
+  <text class="title" x="600" y="45" text-anchor="middle">Build once, scan contiguous rows in both directions</text>
+  <rect class="box input" x="390" y="75" width="420" height="88"/>
+  <text class="title" x="600" y="112" text-anchor="middle">Input A</text>
+  <text class="label" x="600" y="143" text-anchor="middle">CSC or CSR, FP32 + int32</text>
+  <path class="arrow" d="M490 163 C490 205 325 200 325 245"/>
+  <path class="arrow" d="M710 163 C710 205 875 200 875 245"/>
+  <rect class="box csr" x="80" y="245" width="490" height="145"/>
+  <text class="title" x="325" y="288" text-anchor="middle">CSR(A): m x n</text>
+  <text class="label" x="325" y="325" text-anchor="middle">row_ptr | col_ind | values</text>
+  <text class="small" x="325" y="360" text-anchor="middle">row i is contiguous</text>
+  <rect class="box csc" x="630" y="245" width="490" height="145"/>
+  <text class="title" x="875" y="288" text-anchor="middle">CSC(A) = CSR(A^T): n x m</text>
+  <text class="label" x="875" y="325" text-anchor="middle">col_ptr | row_ind | values</text>
+  <text class="small" x="875" y="360" text-anchor="middle">column j becomes transpose row j</text>
+  <path class="convert" d="M570 315 H630"/>
+  <path class="convert" d="M630 350 H570"/>
+  <text class="small" x="600" y="298" text-anchor="middle" fill="#a33b20">one-time</text>
+  <path class="arrow" d="M325 390 V465"/>
+  <path class="arrow" d="M875 390 V465"/>
+  <rect class="box op" x="110" y="465" width="430" height="120"/>
+  <text class="title" x="325" y="510" text-anchor="middle">Forward SpMV</text>
+  <text class="label" x="325" y="550" text-anchor="middle">u = A v - alpha u</text>
+  <rect class="box op" x="660" y="465" width="430" height="120"/>
+  <text class="title" x="875" y="510" text-anchor="middle">Transpose SpMV</text>
+  <text class="label" x="875" y="550" text-anchor="middle">v = A^T u - beta v</text>
+  <text class="label" x="600" y="642" text-anchor="middle">Both calls: CUSPARSE_OPERATION_NON_TRANSPOSE</text>
+</svg>
+

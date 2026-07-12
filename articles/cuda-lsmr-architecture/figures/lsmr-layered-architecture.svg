@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 700" role="img" aria-labelledby="title desc">
+  <title id="title">Layered CUDA LSMR architecture</title>
+  <desc id="desc">The public API calls the solver, which dispatches through a linear operator to sparse or dense backends backed by a shared runtime.</desc>
+  <defs>
+    <style>
+      .bg { fill: #f7f3e8; }
+      .box { fill: #fffdf6; stroke: #263238; stroke-width: 3; rx: 18; }
+      .api { fill: #e9b44c; }
+      .solver { fill: #dce9d5; }
+      .sparse { fill: #b8d8e8; }
+      .dense { fill: #f3c6b8; }
+      .runtime { fill: #283845; }
+      .t1 { font: 700 29px 'DejaVu Sans', sans-serif; fill: #172026; }
+      .t2 { font: 500 21px 'DejaVu Sans', sans-serif; fill: #263238; }
+      .light { fill: #fffdf6; }
+      .arrow { stroke: #263238; stroke-width: 4; fill: none; marker-end: url(#head); }
+      .dash { stroke-dasharray: 10 9; }
+    </style>
+    <marker id="head" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+      <path d="M0 0 L12 6 L0 12 Z" fill="#263238"/>
+    </marker>
+  </defs>
+  <rect class="bg" width="1200" height="700"/>
+  <rect class="box api" x="340" y="45" width="520" height="95"/>
+  <text class="t1" x="600" y="88" text-anchor="middle">Public API</text>
+  <text class="t2" x="600" y="119" text-anchor="middle">Context + Views + Options + Result</text>
+  <path class="arrow" d="M600 140 V188"/>
+  <rect class="box solver" x="340" y="190" width="520" height="112"/>
+  <text class="t1" x="600" y="235" text-anchor="middle">LSMR Solver</text>
+  <text class="t2" x="600" y="268" text-anchor="middle">Golub-Kahan + rotations + stopping</text>
+  <path class="arrow" d="M600 302 V348"/>
+  <rect class="box" x="390" y="350" width="420" height="90"/>
+  <text class="t1" x="600" y="390" text-anchor="middle">LinearOperator</text>
+  <text class="t2" x="600" y="421" text-anchor="middle">A*x and A^T*x only</text>
+  <path class="arrow" d="M500 440 C500 480 330 470 330 515"/>
+  <path class="arrow" d="M700 440 C700 480 870 470 870 515"/>
+  <rect class="box sparse" x="90" y="515" width="480" height="100"/>
+  <text class="t1" x="330" y="557" text-anchor="middle">Sparse Backend</text>
+  <text class="t2" x="330" y="589" text-anchor="middle">CSR(A) + CSR(A^T) / cuSPARSE</text>
+  <rect class="box dense" x="630" y="515" width="480" height="100"/>
+  <text class="t1" x="870" y="557" text-anchor="middle">Dense Backend</text>
+  <text class="t2" x="870" y="589" text-anchor="middle">Column-major A / cuBLAS GEMV</text>
+  <rect class="box runtime" x="175" y="642" width="850" height="48"/>
+  <text class="t2 light" x="600" y="674" text-anchor="middle">Runtime: stream | handles | private memory pool | fused kernels</text>
+  <path class="arrow dash" d="M330 615 V638"/>
+  <path class="arrow dash" d="M870 615 V638"/>
+</svg>
+
