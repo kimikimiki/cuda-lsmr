@@ -1,0 +1,8 @@
+/build/
+/.cache/
+*.egg-info/
+*.so
+*.pyc
+__pycache__/
+benchmark-results/
+

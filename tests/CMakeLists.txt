@@ -1,0 +1,4 @@
+add_executable(cuda_lsmr_version_test version_test.cpp)
+target_link_libraries(cuda_lsmr_version_test PRIVATE cuda_lsmr::cuda_lsmr)
+add_test(NAME cuda_lsmr_version_test COMMAND cuda_lsmr_version_test)
+
