@@ -39,6 +39,7 @@ class Context {
 
  private:
   struct Impl;
+  static std::unique_ptr<Impl> CreateImpl(cudaStream_t stream, bool owns_stream);
   std::unique_ptr<Impl> impl_;
 
   friend class LinearOperator;
@@ -48,4 +49,3 @@ class Context {
 };
 
 }  // namespace cuda_lsmr
-

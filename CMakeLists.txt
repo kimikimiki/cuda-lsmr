@@ -12,6 +12,9 @@ option(CUDA_LSMR_BUILD_PYTHON "Build the pybind11 benchmark module" OFF)
 option(CUDA_LSMR_WARNINGS_AS_ERRORS "Treat project warnings as errors" OFF)
 
 add_library(cuda_lsmr
+  src/runtime/context.cu
+  src/operators/dense_matrix.cu
+  src/operators/sparse_matrix.cu
   src/version.cpp
 )
 add_library(cuda_lsmr::cuda_lsmr ALIAS cuda_lsmr)
@@ -21,6 +24,8 @@ target_include_directories(cuda_lsmr
   PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     $<INSTALL_INTERFACE:include>
+  PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/src
 )
 target_link_libraries(cuda_lsmr
   PUBLIC
@@ -41,7 +46,6 @@ if(CUDA_LSMR_WARNINGS_AS_ERRORS)
 endif()
 target_compile_options(cuda_lsmr PRIVATE
   $<$<COMPILE_LANGUAGE:CXX>:${_cuda_lsmr_warning_flags}>
-  $<$<COMPILE_LANGUAGE:CUDA>:-Xcompiler=${_cuda_lsmr_warning_flags}>
 )
 
 if(CUDA_LSMR_BUILD_TESTS)
@@ -61,4 +65,3 @@ install(EXPORT cuda_lsmrTargets
   NAMESPACE cuda_lsmr::
   DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/cuda_lsmr
 )
-

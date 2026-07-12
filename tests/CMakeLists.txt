@@ -2,3 +2,7 @@ add_executable(cuda_lsmr_version_test version_test.cpp)
 target_link_libraries(cuda_lsmr_version_test PRIVATE cuda_lsmr::cuda_lsmr)
 add_test(NAME cuda_lsmr_version_test COMMAND cuda_lsmr_version_test)
 
+add_executable(cuda_lsmr_operator_test operator_test.cu)
+target_link_libraries(cuda_lsmr_operator_test PRIVATE cuda_lsmr::cuda_lsmr)
+set_target_properties(cuda_lsmr_operator_test PROPERTIES CUDA_ARCHITECTURES "86")
+add_test(NAME cuda_lsmr_operator_test COMMAND cuda_lsmr_operator_test)
