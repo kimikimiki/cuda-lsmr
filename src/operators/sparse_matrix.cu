@@ -50,12 +50,14 @@ struct SparseMatrix::Impl {
         rows(row_count),
         cols(column_count),
         nnz(nonzeros),
-        csr_offsets(static_cast<std::size_t>(rows + 1), owner.stream()),
-        csr_indices(static_cast<std::size_t>(nnz), owner.stream()),
-        csr_values(static_cast<std::size_t>(nnz), owner.stream()),
-        csc_offsets(static_cast<std::size_t>(cols + 1), owner.stream()),
-        csc_indices(static_cast<std::size_t>(nnz), owner.stream()),
-        csc_values(static_cast<std::size_t>(nnz), owner.stream()) {}
+        csr_offsets(static_cast<std::size_t>(rows + 1), owner.stream(),
+                    owner.impl_->pool),
+        csr_indices(static_cast<std::size_t>(nnz), owner.stream(), owner.impl_->pool),
+        csr_values(static_cast<std::size_t>(nnz), owner.stream(), owner.impl_->pool),
+        csc_offsets(static_cast<std::size_t>(cols + 1), owner.stream(),
+                    owner.impl_->pool),
+        csc_indices(static_cast<std::size_t>(nnz), owner.stream(), owner.impl_->pool),
+        csc_values(static_cast<std::size_t>(nnz), owner.stream(), owner.impl_->pool) {}
 
   /// Creates matrix/vector descriptors and reserves one reusable SpMV buffer.
   void InitializeDescriptors() {
@@ -88,7 +90,8 @@ struct SparseMatrix::Impl {
         context.impl_->cusparse, CUSPARSE_OPERATION_NON_TRANSPOSE, &alpha,
         transpose_descriptor, at_x, &beta, at_y, CUDA_R_32F,
         CUSPARSE_SPMV_CSR_ALG1, &at_bytes));
-    spmv_buffer.Resize(std::max(ax_bytes, at_bytes), context.stream());
+    spmv_buffer.Resize(std::max(ax_bytes, at_bytes), context.stream(),
+                       context.impl_->pool);
   }
 
   /// Converts CSR input to CSC output with cuSPARSE generic storage conversion.
@@ -104,7 +107,7 @@ struct SparseMatrix::Impl {
         input_values, input_offsets, input_indices, output_values,
         output_offsets, output_indices, CUDA_R_32F, CUSPARSE_ACTION_NUMERIC,
         CUSPARSE_INDEX_BASE_ZERO, CUSPARSE_CSR2CSC_ALG1, &bytes));
-    conversion_buffer.Resize(bytes, context.stream());
+    conversion_buffer.Resize(bytes, context.stream(), context.impl_->pool);
     CUDA_LSMR_CHECK_CUSPARSE(cusparseCsr2cscEx2(
         context.impl_->cusparse, conversion_rows, conversion_cols, nnz,
         input_values, input_offsets, input_indices, output_values,
@@ -115,11 +118,10 @@ struct SparseMatrix::Impl {
 
   /// Executes one cached-descriptor non-transpose SpMV.
   void Spmv(cusparseSpMatDescr_t matrix, cusparseDnVecDescr_t input,
-            cusparseDnVecDescr_t output, const float* x, float* y) const {
+            cusparseDnVecDescr_t output, float alpha, const float* x,
+            float beta, float* y) const {
     CUDA_LSMR_CHECK_CUSPARSE(cusparseDnVecSetValues(input, const_cast<float*>(x)));
     CUDA_LSMR_CHECK_CUSPARSE(cusparseDnVecSetValues(output, y));
-    const float alpha = 1.0F;
-    const float beta = 0.0F;
     CUDA_LSMR_CHECK_CUSPARSE(cusparseSpMV(
         context.impl_->cusparse, CUSPARSE_OPERATION_NON_TRANSPOSE, &alpha,
         matrix, input, &beta, output, CUDA_R_32F,
@@ -226,16 +228,26 @@ std::int64_t SparseMatrix::cols() const noexcept { return impl_->cols; }
 std::int64_t SparseMatrix::nnz() const noexcept { return impl_->nnz; }
 
 void SparseMatrix::apply(const float* x, float* y) const {
-  if (x == nullptr || y == nullptr) throw Error("SparseMatrix::apply received null");
-  impl_->Spmv(impl_->csr_descriptor, impl_->ax_x, impl_->ax_y, x, y);
+  apply_scaled(1.0F, x, 0.0F, y);
 }
 
 void SparseMatrix::apply_transpose(const float* x, float* y) const {
+  apply_transpose_scaled(1.0F, x, 0.0F, y);
+}
+
+void SparseMatrix::apply_scaled(float alpha, const float* x, float beta,
+                                float* y) const {
+  if (x == nullptr || y == nullptr) throw Error("SparseMatrix::apply received null");
+  impl_->Spmv(impl_->csr_descriptor, impl_->ax_x, impl_->ax_y, alpha, x, beta, y);
+}
+
+void SparseMatrix::apply_transpose_scaled(float alpha, const float* x,
+                                          float beta, float* y) const {
   if (x == nullptr || y == nullptr) {
     throw Error("SparseMatrix::apply_transpose received null");
   }
-  impl_->Spmv(impl_->transpose_descriptor, impl_->at_x, impl_->at_y, x, y);
+  impl_->Spmv(impl_->transpose_descriptor, impl_->at_x, impl_->at_y, alpha, x,
+              beta, y);
 }
 
 }  // namespace cuda_lsmr
-

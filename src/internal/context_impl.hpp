@@ -9,6 +9,9 @@
 namespace cuda_lsmr {
 
 struct Context::Impl {
+  /// Releases partially or fully initialized CUDA resources safely.
+  ~Impl();
+
   cudaStream_t stream{};
   bool owns_stream{};
   int device{};
@@ -18,4 +21,3 @@ struct Context::Impl {
 };
 
 }  // namespace cuda_lsmr
-

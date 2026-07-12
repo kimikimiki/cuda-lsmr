@@ -21,10 +21,18 @@ class LinearOperator {
   [[nodiscard]] virtual std::int64_t cols() const noexcept = 0;
 
   /// Computes `y = A * x` on the context stream.
-  virtual void apply(const float* x, float* y) const = 0;
+  virtual void apply(const float* x, float* y) const;
 
   /// Computes `y = A^T * x` on the context stream.
-  virtual void apply_transpose(const float* x, float* y) const = 0;
+  virtual void apply_transpose(const float* x, float* y) const;
+
+  /// Computes `y = alpha * A * x + beta * y` on the context stream.
+  virtual void apply_scaled(float alpha, const float* x, float beta,
+                            float* y) const = 0;
+
+  /// Computes `y = alpha * A^T * x + beta * y` on the context stream.
+  virtual void apply_transpose_scaled(float alpha, const float* x, float beta,
+                                      float* y) const = 0;
 };
 
 /// Owns CSR(A) and CSC(A) device copies for transpose-free SpMV dispatch.
@@ -59,6 +67,14 @@ class SparseMatrix final : public LinearOperator {
   /// Computes `y = A^T * x` through CSC(A) interpreted as CSR(A^T).
   void apply_transpose(const float* x, float* y) const override;
 
+  /// Computes a scaled CSR(A) SpMV.
+  void apply_scaled(float alpha, const float* x, float beta,
+                    float* y) const override;
+
+  /// Computes a scaled CSR(A^T) SpMV.
+  void apply_transpose_scaled(float alpha, const float* x, float beta,
+                              float* y) const override;
+
  private:
   struct Impl;
   explicit SparseMatrix(std::unique_ptr<Impl> impl);
@@ -90,6 +106,14 @@ class DenseMatrix final : public LinearOperator {
   /// Computes `y = A^T * x` with cuBLAS.
   void apply_transpose(const float* x, float* y) const override;
 
+  /// Computes a scaled cuBLAS GEMV.
+  void apply_scaled(float alpha, const float* x, float beta,
+                    float* y) const override;
+
+  /// Computes a scaled transposed cuBLAS GEMV.
+  void apply_transpose_scaled(float alpha, const float* x, float beta,
+                              float* y) const override;
+
  private:
   struct Impl;
   explicit DenseMatrix(std::unique_ptr<Impl> impl);
@@ -97,4 +121,3 @@ class DenseMatrix final : public LinearOperator {
 };
 
 }  // namespace cuda_lsmr
-

@@ -14,7 +14,13 @@ std::unique_ptr<Context::Impl> Context::CreateImpl(cudaStream_t stream,
   impl->stream = stream;
   impl->owns_stream = owns_stream;
   CUDA_LSMR_CHECK_CUDA(cudaGetDevice(&impl->device));
-  CUDA_LSMR_CHECK_CUDA(cudaDeviceGetDefaultMemPool(&impl->pool, impl->device));
+
+  cudaMemPoolProps properties{};
+  properties.allocType = cudaMemAllocationTypePinned;
+  properties.handleTypes = cudaMemHandleTypeNone;
+  properties.location.type = cudaMemLocationTypeDevice;
+  properties.location.id = impl->device;
+  CUDA_LSMR_CHECK_CUDA(cudaMemPoolCreate(&impl->pool, &properties));
 
   std::uint64_t threshold = std::numeric_limits<std::uint64_t>::max();
   CUDA_LSMR_CHECK_CUDA(cudaMemPoolSetAttribute(
@@ -26,16 +32,19 @@ std::unique_ptr<Context::Impl> Context::CreateImpl(cudaStream_t stream,
   return impl;
 }
 
+Context::Impl::~Impl() {
+  if (stream != nullptr) static_cast<void>(cudaStreamSynchronize(stream));
+  if (cusparse != nullptr) static_cast<void>(cusparseDestroy(cusparse));
+  if (cublas != nullptr) static_cast<void>(cublasDestroy(cublas));
+  if (pool != nullptr) static_cast<void>(cudaMemPoolDestroy(pool));
+  if (owns_stream && stream != nullptr) static_cast<void>(cudaStreamDestroy(stream));
+}
+
 Context::Context() {
   cudaStream_t stream{};
   CUDA_LSMR_CHECK_CUDA(
       cudaStreamCreateWithFlags(&stream, cudaStreamNonBlocking));
-  try {
-    impl_ = CreateImpl(stream, true);
-  } catch (...) {
-    static_cast<void>(cudaStreamDestroy(stream));
-    throw;
-  }
+  impl_ = CreateImpl(stream, true);
 }
 
 Context::Context(cudaStream_t stream) {
@@ -45,21 +54,7 @@ Context::Context(cudaStream_t stream) {
   impl_ = CreateImpl(stream, false);
 }
 
-Context::~Context() {
-  if (!impl_) {
-    return;
-  }
-  static_cast<void>(cudaStreamSynchronize(impl_->stream));
-  if (impl_->cusparse != nullptr) {
-    static_cast<void>(cusparseDestroy(impl_->cusparse));
-  }
-  if (impl_->cublas != nullptr) {
-    static_cast<void>(cublasDestroy(impl_->cublas));
-  }
-  if (impl_->owns_stream && impl_->stream != nullptr) {
-    static_cast<void>(cudaStreamDestroy(impl_->stream));
-  }
-}
+Context::~Context() = default;
 
 Context::Context(Context&&) noexcept = default;
 Context& Context::operator=(Context&&) noexcept = default;

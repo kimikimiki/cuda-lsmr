@@ -23,7 +23,8 @@ struct DenseMatrix::Impl {
         rows(row_count),
         cols(column_count),
         leading_dimension(leading_dim),
-        values(static_cast<std::size_t>(leading_dim * column_count), owner.stream()) {}
+        values(static_cast<std::size_t>(leading_dim * column_count), owner.stream(),
+               owner.impl_->pool) {}
 
   Context& context;
   std::int64_t rows{};
@@ -65,21 +66,27 @@ std::int64_t DenseMatrix::rows() const noexcept { return impl_->rows; }
 std::int64_t DenseMatrix::cols() const noexcept { return impl_->cols; }
 
 void DenseMatrix::apply(const float* x, float* y) const {
+  apply_scaled(1.0F, x, 0.0F, y);
+}
+
+void DenseMatrix::apply_transpose(const float* x, float* y) const {
+  apply_transpose_scaled(1.0F, x, 0.0F, y);
+}
+
+void DenseMatrix::apply_scaled(float alpha, const float* x, float beta,
+                               float* y) const {
   if (x == nullptr || y == nullptr) throw Error("DenseMatrix::apply received null");
-  const float alpha = 1.0F;
-  const float beta = 0.0F;
   CUDA_LSMR_CHECK_CUBLAS(cublasSgemv(
       impl_->context.impl_->cublas, CUBLAS_OP_N, static_cast<int>(impl_->rows),
       static_cast<int>(impl_->cols), &alpha, impl_->values.data(),
       static_cast<int>(impl_->leading_dimension), x, 1, &beta, y, 1));
 }
 
-void DenseMatrix::apply_transpose(const float* x, float* y) const {
+void DenseMatrix::apply_transpose_scaled(float alpha, const float* x,
+                                         float beta, float* y) const {
   if (x == nullptr || y == nullptr) {
     throw Error("DenseMatrix::apply_transpose received null");
   }
-  const float alpha = 1.0F;
-  const float beta = 0.0F;
   CUDA_LSMR_CHECK_CUBLAS(cublasSgemv(
       impl_->context.impl_->cublas, CUBLAS_OP_T, static_cast<int>(impl_->rows),
       static_cast<int>(impl_->cols), &alpha, impl_->values.data(),
@@ -87,4 +94,3 @@ void DenseMatrix::apply_transpose(const float* x, float* y) const {
 }
 
 }  // namespace cuda_lsmr
-

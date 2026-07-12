@@ -16,7 +16,9 @@ class DeviceBuffer {
   DeviceBuffer() = default;
 
   /// Allocates `count` elements in stream order.
-  DeviceBuffer(std::size_t count, cudaStream_t stream) { Resize(count, stream); }
+  DeviceBuffer(std::size_t count, cudaStream_t stream, cudaMemPool_t pool) {
+    Resize(count, stream, pool);
+  }
 
   /// Returns storage to the pool in stream order.
   ~DeviceBuffer() { ResetNoThrow(); }
@@ -35,16 +37,17 @@ class DeviceBuffer {
   }
 
   /// Reallocates storage when the requested capacity exceeds the current one.
-  void Resize(std::size_t count, cudaStream_t stream) {
+  void Resize(std::size_t count, cudaStream_t stream, cudaMemPool_t pool) {
     if (count <= capacity_) {
       size_ = count;
       return;
     }
     Reset();
     stream_ = stream;
+    pool_ = pool;
     if (count > 0) {
-      CUDA_LSMR_CHECK_CUDA(
-          cudaMallocAsync(reinterpret_cast<void**>(&data_), count * sizeof(T), stream_));
+      CUDA_LSMR_CHECK_CUDA(cudaMallocFromPoolAsync(
+          reinterpret_cast<void**>(&data_), count * sizeof(T), pool_, stream_));
     }
     size_ = count;
     capacity_ = count;
@@ -87,13 +90,14 @@ class DeviceBuffer {
     std::swap(size_, other.size_);
     std::swap(capacity_, other.capacity_);
     std::swap(stream_, other.stream_);
+    std::swap(pool_, other.pool_);
   }
 
   T* data_{};
   std::size_t size_{};
   std::size_t capacity_{};
   cudaStream_t stream_{};
+  cudaMemPool_t pool_{};
 };
 
 }  // namespace cuda_lsmr::internal
-

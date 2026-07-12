@@ -11,10 +11,13 @@ option(CUDA_LSMR_BUILD_TESTS "Build C++ tests" ON)
 option(CUDA_LSMR_BUILD_PYTHON "Build the pybind11 benchmark module" OFF)
 option(CUDA_LSMR_WARNINGS_AS_ERRORS "Treat project warnings as errors" OFF)
 
-add_library(cuda_lsmr
+add_library(cuda_lsmr SHARED
   src/runtime/context.cu
   src/operators/dense_matrix.cu
+  src/operators/linear_operator.cpp
   src/operators/sparse_matrix.cu
+  src/kernels/vector_ops.cu
+  src/solver/solver.cu
   src/version.cpp
 )
 add_library(cuda_lsmr::cuda_lsmr ALIAS cuda_lsmr)
