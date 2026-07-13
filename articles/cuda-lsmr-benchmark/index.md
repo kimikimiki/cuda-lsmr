@@ -1,5 +1,5 @@
 ---
-title: "CUDA LSMR 专栏（三）：递推融合与 Dataset A/Dataset B 实测"
+title: "CUDA LSMR 专栏（三）：递推融合与真实稀疏系统实测"
 published: 2026-06-18
 description: "把 LSMR 小向量递推融合为 CUDA kernel，并用两组真实 FP32 重建输入对齐 CuPy 的迭代、残差与性能。"
 tags:
@@ -68,7 +68,7 @@ h *= -theta_over_rho
 h += v
 ```
 
-memory pool 可以复用分配，却不会自动把这些语句融合成一个 CUDA kernel；矩阵乘法返回临时向量后，后续加法也会增加一次遍历。对于 Dataset A/Dataset B 这类每轮 SpMV 已很快、迭代约百次的输入，host 调度和小 kernel 数量不是零成本。
+memory pool 可以复用分配，却不会自动把这些语句融合成一个 CUDA kernel；矩阵乘法返回临时向量后，后续加法也会增加一次遍历。对于 Dataset A/B 这类每轮 SpMV 已很快、迭代约百次的输入，host 调度和小 kernel 数量不是零成本。
 
 纯 CUDA 库有两个可控点：矩阵递推通过 cuSPARSE 的 `beta` 参数原位完成；依赖明确的小向量递推手写融合。范数仍交给 cuBLAS，不重复实现工业归约。
 
@@ -142,7 +142,7 @@ context.synchronize();
 
 用于对比的 pybind11 层不参与算法，只接收 CuPy 的 `b.data.ptr` 与 `x.data.ptr`。矩阵加载、SciPy 转 CSC、H2D、双格式构造和两轮 warmup 都在计时外。CuPy 显式传入 FP32 零 `x0`，避免其兼容路径把迭代解向量提升精度。
 
-## 8. Dataset A/Dataset B 结果、容差与局限
+## 8. Dataset A/B 结果、容差与局限
 
 测试环境为 RTX 3060 Laptop 6 GiB、CUDA 12.9.86、driver 581.57、CuPy 14.0.1。参数固定为 `damp=0`、`atol=btol=1e-6`、`conlim=1e8`、`maxiter=5000`。每组执行 7 次同步 solve，报告中位数。
 
@@ -167,4 +167,3 @@ context.synchronize();
 - [OneFlow：高效 Softmax CUDA kernel](https://www.oneflow.org/a/share/jishuboke/54.html)
 - [OneFlow：系统设计（下）](https://www.oneflow.org/a/share/jishuboke/55.html)
 - [CUDA Programming Guide：显式 memory pool](https://docs.nvidia.com/cuda/cuda-programming-guide/04-special-topics/stream-ordered-memory-allocation.html)
-

@@ -53,10 +53,10 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--data-root",
         type=Path,
-        default=Path("/path/to/private/source/debug"),
+        required=True,
     )
     parser.add_argument("--frame", type=int, default=0)
-    parser.add_argument("--datasets", default="Dataset A,Dataset B")
+    parser.add_argument("--datasets", required=True)
     parser.add_argument("--repeats", type=int, default=3)
     parser.add_argument("--atol", type=float, default=1.0e-6)
     parser.add_argument("--btol", type=float, default=1.0e-6)

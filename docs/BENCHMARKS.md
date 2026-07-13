@@ -6,20 +6,19 @@
 - GPU: NVIDIA GeForce RTX 3060 Laptop GPU, compute capability 8.6, 6144 MiB
 - Driver: 581.57
 - CUDA Toolkit: 12.9.86
-- Python: `/path/to/private/source/.venv/bin/python`
+- Python: project virtual environment
 - CuPy: 14.0.1
 - SciPy: 1.15.3
 - NumPy: 2.2.6
 
 ## Inputs
 
-The source directory was read only. No files under
-`/path/to/private/source` were modified.
+The private source directory was mounted read only and was not modified.
 
 | Dataset | MAT input | Shape | nnz |
 | --- | --- | ---: | ---: |
-| Dataset A | `debug/Dataset A/private_input.mat` | 306136 x 6177 | 5,588,894 |
-| Dataset B | `debug/Dataset B/private_input.mat` | 936063 x 23394 | 19,747,202 |
+| Dataset A | Private MAT input | 306136 x 6177 | 5,588,894 |
+| Dataset B | Private MAT input | 936063 x 23394 | 19,747,202 |
 
 Both `A_aug` and `b_aug` were loaded as FP32. CSC indices were sorted and kept as
 signed int32.
@@ -39,9 +38,10 @@ signed int32.
 Command:
 
 ```bash
-PYTHONPATH=build/python /path/to/private/source/.venv/bin/python \
+PYTHONPATH=build/python python3 \
   benchmarks/benchmark_real_data.py \
-  --datasets Dataset A,Dataset B --frame 0 --repeats 7 --maxiter 5000 \
+  --data-root /path/to/private/benchmark-inputs \
+  --datasets dataset-a,dataset-b --frame 0 --repeats 7 --maxiter 5000 \
   --output benchmark-results/frame0-fp32.json
 ```
 

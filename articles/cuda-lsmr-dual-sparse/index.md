@@ -158,7 +158,7 @@ cudaFreeAsync(data, stream);
 
 双存储适用于矩阵复用多个迭代、显存充足、两个方向频率相近的场景。如果矩阵只乘一次、转置极少使用，或双份数据会逼近 OOM，应回退为单格式。若索引或 $\operatorname{nnz}$ 超过 int32 范围，当前 API 会拒绝输入，而不是截断。
 
-下一篇会进入剩余热路径：怎样融合 $\bar h/x/h$ 递推，以及为什么最终 Dataset A/Dataset B 的迭代轨迹能与 CuPy 对齐。
+下一篇会进入剩余热路径：怎样融合 $\bar h/x/h$ 递推，以及为什么最终 Dataset A/B 的迭代轨迹能与 CuPy 对齐。
 
 ## 9. 参考资料
 
@@ -167,4 +167,3 @@ cudaFreeAsync(data, stream);
 - [NVIDIA：Using the Stream-Ordered Memory Allocator](https://developer.nvidia.com/blog/using-cuda-stream-ordered-memory-allocator-part-1/)
 - [OneFlow：高效 Softmax CUDA kernel 的带宽分析与 shape 分段](https://www.oneflow.org/a/share/jishuboke/54.html)
 - [dlog：CUB 归约的分层设计](https://dlog.com.cn/posts/cuda09/cub/)
-

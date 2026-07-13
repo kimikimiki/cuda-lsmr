@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 700" role="img" aria-labelledby="title desc">
   <title id="title">FP32 LSMR benchmark comparison</title>
-  <desc id="desc">Median solve times for cuda-lsmr and CuPy on the Dataset A and Dataset B frame zero datasets.</desc>
+  <desc id="desc">Median solve times for cuda-lsmr and CuPy on two private datasets.</desc>
   <defs>
     <style>
       .bg { fill: #f7f3e8; }

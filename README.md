@@ -130,14 +130,15 @@ The optional pybind11 module exists for CuPy interoperability and benchmark
 validation. The public library itself does not depend on Python.
 
 ```bash
-PYTHON=/path/to/private/source/.venv/bin/python
+PYTHON=python3
 cmake -S . -B build \
   -DCUDA_LSMR_BUILD_PYTHON=ON \
   -DPython_EXECUTABLE="$PYTHON" \
   -Dpybind11_DIR="$($PYTHON -m pybind11 --cmakedir)"
 cmake --build build -j
 PYTHONPATH=build/python "$PYTHON" benchmarks/benchmark_real_data.py \
-  --datasets Dataset A,Dataset B --frame 0 --repeats 7 --maxiter 5000
+  --data-root /path/to/private/benchmark-inputs \
+  --datasets dataset-a,dataset-b --frame 0 --repeats 7 --maxiter 5000
 ```
 
 The binding receives CuPy device pointers for `b` and `x`; MAT loading, sparse
@@ -145,9 +146,8 @@ conversion, matrix upload, and warmup are excluded from timed solves.
 
 ## Verified FP32 benchmark
 
-Seven synchronized repetitions on the platform above, using
-`private_input.mat`, `atol=btol=1e-6`,
-`conlim=1e8`, and `maxiter=5000`:
+Seven synchronized repetitions on the platform above, using two private MAT
+inputs, `atol=btol=1e-6`, `conlim=1e8`, and `maxiter=5000`:
 
 | Dataset | Shape | nnz | cuda-lsmr median | CuPy 14.0.1 median | Ratio | Iterations |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
